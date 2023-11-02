@@ -3,7 +3,9 @@ WORKDIR /opt/airflow/
 USER root
 RUN apt-get update \
   && apt-get install -y \
-         vim 
+         vim \
+         curl \
+         htop
 ENV PATH="${AIRFLOW_HOME}:${PATH}"
 RUN chown -R airflow /opt/airflow
 USER airflow
