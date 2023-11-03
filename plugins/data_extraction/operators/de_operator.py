@@ -29,5 +29,11 @@ class DataExtractionFuelSalesOperator(BaseOperator):
         transformed_df = hook.transform_data(
                     df
                 )
-
-        print(tabulate(transformed_df, headers='keys', tablefmt='psql'))
+        
+        print(transformed_df)
+        
+        validated_df = hook.validate_schema(
+                    transformed_df
+                )
+                
+        print(tabulate(validated_df, headers='keys', tablefmt='psql'))

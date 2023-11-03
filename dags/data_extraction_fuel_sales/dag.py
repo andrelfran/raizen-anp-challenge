@@ -20,13 +20,18 @@ with DAG(
     xls_path = dirname(abspath(__file__))
     xls_fullpath = xls_path + "/anp_file/vendas-combustiveis-m3.xls"
 
-    sheets = ['DPCache_m3','DPCache_m3_2']
+    # xls_fullpath = 'https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls'
 
-    for sheet in sheets:
+    SHEETS = [
+        'DPCache_m3',
+        'DPCache_m3_2'
+    ]
+
+    for sheet in SHEETS:
         with TaskGroup(group_id=sheet) as task_tg:
-            extract = DataExtractionFuelSalesOperator(
-                task_id="extract",
+            process_sheet = DataExtractionFuelSalesOperator(
+                task_id="process_sheet",
                 path=xls_fullpath,
                 sheet_name=sheet
             )
-            extract
+            process_sheet
