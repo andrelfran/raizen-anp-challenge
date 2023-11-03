@@ -1,6 +1,7 @@
 from airflow.models import BaseOperator
 from data_extraction.hooks.de_hook import DataExtractionFuelSalesHook
 
+from tabulate import tabulate
 
 class DataExtractionFuelSalesOperator(BaseOperator):
     def __init__(
@@ -24,5 +25,9 @@ class DataExtractionFuelSalesOperator(BaseOperator):
                     self.path, 
                     self.sheet_name
                 )
+        
+        transformed_df = hook.transform_data(
+                    df
+                )
 
-        print(df)
+        print(tabulate(transformed_df, headers='keys', tablefmt='psql'))

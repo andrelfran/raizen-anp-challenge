@@ -29,9 +29,4 @@ with DAG(
                 path=xls_fullpath,
                 sheet_name=sheet
             )
-            validate = DataExtractionFuelSalesOperator(
-                task_id="validate",
-                path=xls_fullpath,
-                sheet_name=sheet
-            )
-            extract >> validate
+            extract
