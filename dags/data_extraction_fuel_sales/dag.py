@@ -1,11 +1,11 @@
 import datetime
-import os
-
 from os.path import dirname, abspath
 
 from airflow import DAG
 from airflow.utils.task_group import TaskGroup
 from data_extraction.operators.de_operator import DataExtractionFuelSalesOperator
+
+from airflow.models import Variable
 
 DAG_NAME = "data_extraction_fuel_sales"
 
@@ -17,21 +17,35 @@ with DAG(
     tags=["fuel","sales"],
 ) as dag:
     
-    xls_path = dirname(abspath(__file__))
-    xls_fullpath = xls_path + "/anp_file/vendas-combustiveis-m3.xls"
+    dag_config = Variable.get(
+                        'data_extraction_config',
+                        deserialize_json=True,
+                    )
 
-    # xls_fullpath = 'https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls'
+    assert 'url' in dag_config
 
-    SHEETS = [
-        'DPCache_m3',
-        'DPCache_m3_2'
-    ]
+    if dag_config.get('url'):
+        xls_fullpath = dag_config.get('url')
+    else:   
+        xls_path = dirname(abspath(__file__))
+        xls_fullpath = xls_path + "/anp_file/vendas-combustiveis-m3.xls"
 
-    for sheet in SHEETS:
+    assert 'sheets' in dag_config
+
+    if dag_config.get("sheets"):
+        sheets = dag_config.get("sheets")
+
+    assert 'bucket' in dag_config
+
+    if dag_config.get("bucket"):
+        bucket = dag_config.get("bucket")
+
+    for sheet in sheets:
         with TaskGroup(group_id=sheet) as task_tg:
             process_sheet = DataExtractionFuelSalesOperator(
                 task_id="process_sheet",
                 path=xls_fullpath,
-                sheet_name=sheet
+                sheet_name=sheet,
+                bucket=bucket
             )
             process_sheet
