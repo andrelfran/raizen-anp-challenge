@@ -1,16 +1,14 @@
 # Raízen ANP Challenge
 ---
 
-[[_TOC_]]
+The purpose of this DAG is to obtain the data from the ANP Fuel Sales.XLS file, transform it, and send it to an AWS S3 bucket.
 
-This DAG obtains data from the ANP Fuel Sales.XLS file, transforms it, and sends it to an AWS S3 bucket.
+### Sources:
 
-## Sources:
-
-* #### ANP Fuels Sales ETL test
+* ##### ANP Fuels Sales ETL test
     * https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
 
-* #### Excel File
+* ##### Excel File
     * https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls
 
 ## Variables
