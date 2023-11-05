@@ -7,13 +7,19 @@ import uuid
 
 import awswrangler as wr
 
-from datetime import datetime
-
 import pandera as pa
 from pandera.engines import pandas_engine
 
+from datetime import datetime
+
 
 class DataExtractionFuelSalesHook(BaseHook):
+    """
+    This Hook is responsible for obtaining the data, transforming it, validating the schema, 
+    and sending the final results to the AWS S3 bucket.
+
+    Params:
+    """
     def __init__(
         self,
         **kwargs,
@@ -25,6 +31,16 @@ class DataExtractionFuelSalesHook(BaseHook):
         path,
         sheet_name
     ):
+        """
+        This method gets the data in an XLS file.
+
+        Params:
+        path (str): .XLS file
+        sheet_name: Sheet name in .XlS file
+
+        Returns:
+        object:Returning a DataFrame object
+        """
         logging.info("Extracting data...")
 
         df = pd.read_excel(
@@ -40,10 +56,19 @@ class DataExtractionFuelSalesHook(BaseHook):
         else:
             raise AirflowSkipException("DataFrame is empty!")
         
-    def validate_columns(
+    def translate_columns(
         self,
         df
     ):
+        """
+        This method translates the columns to English.
+
+        Params:
+        df (object): DataFrame object
+
+        Returns:
+        object:Returning a DataFrame object
+        """
         columns = ["COMBUSTÍVEL","ANO","ANO"]
 
         for column in columns:
@@ -60,10 +85,19 @@ class DataExtractionFuelSalesHook(BaseHook):
         
         return df
     
-    def validate_months(
+    def translate_col_months(
         self,
         df
     ):
+        """
+        This method translates the Portuguese month columns to numbers.
+
+        Params:
+        df (object): DataFrame object
+
+        Returns:
+        object:Returning a DataFrame object
+        """
         months_br = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 
         for month in months_br:
@@ -71,18 +105,18 @@ class DataExtractionFuelSalesHook(BaseHook):
                 raise AirflowException(f"The following month is not present within the DataFrame: {month}")
 
         df.rename(columns={
-                "Jan": "Jan",
-                "Fev": "Feb", 
-                "Mar": "Mar", 
-                "Abr": "Apr", 
-                "Mai": "May", 
-                "Jun": "Jun", 
-                "Jul": "Jul", 
-                "Ago": "Aug", 
-                "Set": "Sep", 
-                "Out": "Oct", 
-                "Nov": "Nov", 
-                "Dez": "Dec"
+                "Jan": "01",
+                "Fev": "02", 
+                "Mar": "03", 
+                "Abr": "04", 
+                "Mai": "05", 
+                "Jun": "06", 
+                "Jul": "07", 
+                "Ago": "08", 
+                "Set": "09", 
+                "Out": "10", 
+                "Nov": "11", 
+                "Dez": "12"
                 },
                 inplace=True
             )
@@ -93,18 +127,27 @@ class DataExtractionFuelSalesHook(BaseHook):
         self,
         df
     ):
+        """
+        This method transforms the data and prepares it to the schema validation.
+
+        Params:
+        df (object): DataFrame object
+
+        Returns:
+        object:Returning a DataFrame object
+        """
         logging.info("Transforming data...")
 
-        validated_col_df = self.validate_columns(df)
-        validated_month_df = self.validate_months(validated_col_df)
+        validated_col_df = self.translate_columns(df)
+        validated_month_df = self.translate_col_months(validated_col_df)
 
         indexes = ['product','year','uf']
-        months_us = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+        months = ['01','02','03','04','05','06','07','08','09','10','11','12']
 
         melt_df = pd.melt(
                 validated_month_df, 
                 id_vars=indexes, 
-                value_vars=months_us, 
+                value_vars=months, 
                 var_name='month', 
                 value_name='volume'
             )
@@ -113,13 +156,13 @@ class DataExtractionFuelSalesHook(BaseHook):
                             value='0', 
                             inplace=True
                         )
-
         melt_df['volume'] = melt_df['volume'].apply(lambda x: format(float(x),".3f"))
         
         melt_df['year_month'] = melt_df['year'].astype(str) + '_' + melt_df['month'].astype(str).str.lower()
+        melt_df['year_month'] = pd.to_datetime(melt_df['year_month'], format='%Y_%m')
 
         melt_df['unit'] = melt_df['product'].str.extract('.*\((.*)\).*')
-        melt_df['product'] = melt_df['product'].str.replace('\(.*?\)', '', regex=True)
+        melt_df['product'] = melt_df['product'].str.replace('\(.*?\)', '', regex=True).str.strip()
         
         melt_df['created_at'] = pd.Timestamp.utcnow()
 
@@ -129,10 +172,12 @@ class DataExtractionFuelSalesHook(BaseHook):
                                 columns, 
                                 axis ='columns'
                             )
+        
+        setindex_df = reindexed_df.set_index(['year_month','uf','product'], drop=False)
 
-        if not reindexed_df.empty:
-            logging.info(f"The total rows that were transformed: {len(reindexed_df)}")
-            return reindexed_df
+        if not setindex_df.empty:
+            logging.info(f"The total rows that were transformed: {len(setindex_df)}")
+            return setindex_df
         else:
             raise AirflowException("Review the DataFrame transformation!")
     
@@ -140,12 +185,25 @@ class DataExtractionFuelSalesHook(BaseHook):
         self,
         df
     ):
+        """
+        This method validates the DataFrame schema.
+
+        Params:
+        df (object): DataFrame object
+
+        Returns:
+        object:Returning a DataFrame object
+
+        Side Notes:
+        Data type date is not supported by Schema validation. The date must be validated as a datetime type 
+        or a string type; if it is a string type, then checking must be implemented as a year and a month
+        """
         logging.info("Validating schema...")
 
         schema = pa.DataFrameSchema(
-            {
+            columns={
                 "year_month": pa.Column(pandas_engine.DateTime(
-                                        to_datetime_kwargs = {"format":"%Y_%b"}
+                                        to_datetime_kwargs = {"format":"%Y_%m"}
                                     )
                 ),
                 "uf": pa.Column(str),
@@ -154,6 +212,14 @@ class DataExtractionFuelSalesHook(BaseHook):
                 "volume": pa.Column(float),
                 "created_at": pa.Column(pd.Timestamp)
             },
+            index=pa.MultiIndex([
+                pa.Index(pandas_engine.DateTime(
+                                        to_datetime_kwargs = {"format":"%Y_%m"}), 
+                                        name='year_month'
+                                    ),
+                pa.Index(str, name='uf'),
+                pa.Index(str, name='product')
+            ]),
             coerce=True
         )
         try:
@@ -169,6 +235,13 @@ class DataExtractionFuelSalesHook(BaseHook):
         file_name,
         df
     ):
+        """
+        This method sends the processed data to the AWS S3 bucket.
+
+        Params:
+        bucket (str): AWS S3 bucket destination
+        file_name (str): File name that will be placed on AWS S3 bucket
+        """
         logging.info("Uploading data to S3 bucket...")
 
         dt = datetime.utcnow()
@@ -179,7 +252,8 @@ class DataExtractionFuelSalesHook(BaseHook):
 
         wr.s3.to_parquet(
             df=df,
-            path=path
+            path=path,
+            index=True
         )
 
         logging.info("Data has been uploaded successfully!")

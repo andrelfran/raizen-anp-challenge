@@ -1,13 +1,22 @@
 from airflow.models import BaseOperator
 from airflow.exceptions import AirflowException
 
-import logging 
-
 from data_extraction.hooks.de_hook import DataExtractionFuelSalesHook
 
+import logging 
 from tabulate import tabulate
 
+
 class DataExtractionFuelSalesOperator(BaseOperator):
+    """
+    This Operator is responsible for calling the DataExtractionFuelSalesHook, processing the data, 
+    and persisting it on the AWS S3 bucket.
+
+    Params:
+    path (str): .XLS file
+    sheet_name (str): Sheet name in .XlS file
+    bucket (str): AWS S3 bucket destination
+    """
     def __init__(
         self, 
         path,

@@ -13,7 +13,7 @@ with DAG(
     dag_id=DAG_NAME,
     default_args={"retries": 3},
     start_date=datetime.datetime(2023, 1, 1),
-    schedule=None,
+    schedule=None, #TBD
     tags=["fuel","sales"],
 ) as dag:
     
