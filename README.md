@@ -6,11 +6,11 @@ This DAG obtains data from the ANP Fuel Sales.XLS file, transforms it, and sends
 
 ## Sources:
 
-### ANP Fuels Sales ETL test
-https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
+* #### ANP Fuels Sales ETL test
+    * https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
 
-### Excel File
-https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls
+* ### Excel File
+    * https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls
 
 ## Variables
 
@@ -32,7 +32,7 @@ The processed data will be sent to an AWS S3 bucket as in the previous config.
 S3 bucket:
 s3://data-extraction-fuel-sales/processed_files/
 
-# Layers UML Diagram
+## Layers UML Diagram
 
 ```mermaid
 classDiagram
