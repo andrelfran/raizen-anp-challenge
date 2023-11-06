@@ -6,13 +6,11 @@ import pandas as pd
 import uuid
 
 import awswrangler as wr
-
 import pandera as pa
 from pandera.engines import pandas_engine
 
 from datetime import datetime
 
-from tabulate import tabulate
 
 class DataExtractionFuelSalesHook(BaseHook):
     """
@@ -244,11 +242,12 @@ class DataExtractionFuelSalesHook(BaseHook):
 
         path = f"s3://{bucket}/processed_files/{dt_date}/{file_name.lower()}_{uuid.uuid4()}_{dt_timestamp}.parquet"
 
-        wr.s3.to_parquet(
-            df=df,
-            path=path,
-            index=True
-        )
+        if path:
+            wr.s3.to_parquet(
+                df=df,
+                path=path,
+                index=True
+            )
 
-        logging.info("Data has been uploaded successfully!")
+            logging.info("Data has been uploaded successfully!")
 

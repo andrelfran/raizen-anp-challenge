@@ -1,7 +1,8 @@
 ## Raízen ANP Challenge
+
 ---
 
-The purpose of this DAG is to obtain the data from the ANP Fuel Sales.XLS file, transform it, and send it to an AWS S3 bucket.
+The goal of this DAG is to obtain the data from the ANP Fuel Sales.XLS file, transform it, and send it to an AWS S3 bucket.
 
 ### Sources:
 
@@ -25,18 +26,16 @@ A variable must be set up as "data_extraction_config". Follow a sample.
 ```
 ### Executions
 
-![Alt text](image.png)
 
 ### Destination
 
-The processed data will be sent to an AWS S3 bucket as in the previous config.
+As shown in the previous configuration, the processed data will be sent to an AWS S3 bucket.
 
-Follow the S3 bucket example.
-    https://data-extraction-fuel-sales.s3.amazonaws.com/processed_files/2023-11-06/dpcache_m3_2_db7c8b6a-2eb5-40ee-af59-ef087d923af6_20231106204531.parquet
+Files on S3 bucket.
 
-    https://data-extraction-fuel-sales.s3.amazonaws.com/processed_files/2023-11-06/dpcache_m3_5aba5e31-9007-4edd-bfe2-b4136a47ae92_20231106204534.parquet    
+    [dpcache_m3_2](https://data-extraction-fuel-sales.s3.amazonaws.com/processed_files/2023-11-06/dpcache_m3_2_db7c8b6a-2eb5-40ee-af59-ef087d923af6_20231106204531.parquet)
 
-![Alt text](image-1.png)
+    [dpcache_m3](https://data-extraction-fuel-sales.s3.amazonaws.com/processed_files/2023-11-06/dpcache_m3_5aba5e31-9007-4edd-bfe2-b4136a47ae92_20231106204534.parquet)
 
 ### Layers UML Diagram
 
