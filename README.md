@@ -3,7 +3,9 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 
 ### Sources
+
 <hr style="border: 0.1px"></hr>
+
 * #### ANP Fuels Sales ETL test
     https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
 
@@ -12,7 +14,9 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 
 ### Variables
+
 <hr style="border: 0.1px"></hr>
+
 A variable must be set up as "data_extraction_config". Follow the example.
 
 ``` jsonc
@@ -25,7 +29,9 @@ A variable must be set up as "data_extraction_config". Follow the example.
 ```
 
 ### Executions
+
 <hr style="border: 0.1px"></hr>
+
 ![Alt text](image-a.png)
 
 
