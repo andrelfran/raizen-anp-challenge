@@ -23,6 +23,9 @@ A variable must be set up as "data_extraction_config". Follow a sample.
 }
 
 ```
+## Executions
+
+![Alt text](image.png)
 
 ## Destination
 
@@ -33,9 +36,7 @@ Follow the S3 bucket example.
 
     https://data-extraction-fuel-sales.s3.amazonaws.com/processed_files/2023-11-06/dpcache_m3_5aba5e31-9007-4edd-bfe2-b4136a47ae92_20231106204534.parquet    
 
-## Execution
-
-![Alt text](image.png)
+![Alt text](image-1.png)
 
 ## Layers UML Diagram
 
