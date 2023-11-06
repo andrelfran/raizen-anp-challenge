@@ -1,12 +1,8 @@
-## Raízen ANP Challenge
+## ANP Challenge
 The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file, transform it, and send it to an AWS S3 bucket.
-
 
 ### Sources
 ---
-
-* #### ANP Fuels Sales ETL test
-    https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
 
 * #### Excel File
     https://github.com/raizen-analytics/data-engineering-test/raw/master/assets/vendas-combustiveis-m3.xls
@@ -17,7 +13,7 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 A variable must be set up as "data_extraction_config". Follow the example.
 
-``` jsonc
+``` json
 {
     "url": "<.XLS url or .XLS local file path>",
     "sheets": "<[Sheet names that will be processed]>",
