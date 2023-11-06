@@ -1,4 +1,5 @@
 ## Raízen ANP Challenge
+<hr>___</hr>
 
 The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file, transform it, and send it to an AWS S3 bucket.
 
@@ -51,7 +52,7 @@ As shown in the previous configuration, the processed data will be sent to an AW
 ![Alt text](image-b.png)
 
 
-### Layers UML Diagram
+### UML Diagram
 
 ***
 
@@ -71,8 +72,6 @@ classDiagram
 
     class DataExtractionFuelSalesHook{
         + extract_sheet()
-        + translate_columns()
-        + translate_col_months()
         + transform_data()
         + validate_schema()
         + upload_to_s3()
