@@ -1,9 +1,11 @@
 import datetime
+from os.path import dirname, abspath
 
 from airflow import DAG
-from airflow.example_dags.subdags.subdag import subdag
-from airflow.operators.empty import EmptyOperator
-from airflow.operators.subdag import SubDagOperator
+from airflow.utils.task_group import TaskGroup
+from data_extraction.operators.de_operator import DataExtractionFuelSalesOperator
+
+from airflow.models import Variable
 
 DAG_NAME = "data_extraction_fuel_sales"
 
@@ -11,30 +13,40 @@ with DAG(
     dag_id=DAG_NAME,
     default_args={"retries": 3},
     start_date=datetime.datetime(2023, 1, 1),
-    schedule=None,
+    schedule=None, #TBD
     tags=["fuel","sales"],
 ) as dag:
+    
+    dag_config = Variable.get(
+                        'data_extraction_config',
+                        deserialize_json=True,
+                    )
 
-    start = EmptyOperator(
-        task_id="start",
-    )
+    assert 'url' in dag_config
 
-    section_1 = SubDagOperator(
-        task_id="section-1",
-        subdag=subdag(DAG_NAME, "section-1", dag.default_args),
-    )
+    if dag_config.get('url'):
+        xls_fullpath = dag_config.get('url')
+    else:   
+        xls_path = dirname(abspath(__file__))
+        xls_fullpath = xls_path + "/anp_file/vendas-combustiveis-m3.xls"
 
-    some_other_task = EmptyOperator(
-        task_id="some-other-task",
-    )
+    assert 'sheets' in dag_config
 
-    section_2 = SubDagOperator(
-        task_id="section-2",
-        subdag=subdag(DAG_NAME, "section-2", dag.default_args),
-    )
+    if dag_config.get("sheets"):
+        sheets = dag_config.get("sheets")
 
-    end = EmptyOperator(
-        task_id="end",
-    )
+    assert 'bucket' in dag_config
 
-    start >> section_1 >> some_other_task >> section_2 >> end
+    if dag_config.get("bucket"):
+        bucket = dag_config.get("bucket")
+
+    for sheet in sheets:
+        with TaskGroup(group_id=sheet) as task_tg:
+            process_sheet = DataExtractionFuelSalesOperator(
+                task_id="process_sheet",
+                path=xls_fullpath,
+                sheet_name=sheet,
+                bucket=bucket
+            )
+            
+            process_sheet
