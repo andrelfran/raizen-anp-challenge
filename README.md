@@ -3,9 +3,6 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 
 ### Sources
-
-***
-
 * #### ANP Fuels Sales ETL test
     https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
 
