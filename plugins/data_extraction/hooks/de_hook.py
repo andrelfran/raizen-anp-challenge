@@ -12,6 +12,7 @@ from pandera.engines import pandas_engine
 
 from datetime import datetime
 
+from tabulate import tabulate
 
 class DataExtractionFuelSalesHook(BaseHook):
     """
@@ -159,21 +160,15 @@ class DataExtractionFuelSalesHook(BaseHook):
         melt_df['volume'] = melt_df['volume'].apply(lambda x: format(float(x),".3f"))
         
         melt_df['year_month'] = melt_df['year'].astype(str) + '_' + melt_df['month'].astype(str).str.lower()
-        melt_df['year_month'] = pd.to_datetime(melt_df['year_month'], format='%Y_%m')
+        # melt_df['year_month'] = pd.to_datetime(melt_df['year_month'], format='%Y_%m')
 
         melt_df['unit'] = melt_df['product'].str.extract('.*\((.*)\).*')
         melt_df['product'] = melt_df['product'].str.replace('\(.*?\)', '', regex=True).str.strip()
         
         melt_df['created_at'] = pd.Timestamp.utcnow()
-
-        columns = ['year_month','uf','product','unit','volume','created_at']
         
-        reindexed_df = melt_df.reindex(
-                                columns, 
-                                axis ='columns'
-                            )
-        
-        setindex_df = reindexed_df.set_index(['year_month','uf','product'], drop=False)
+        setindex_df = melt_df.set_index(['year_month','uf','product'], drop=False)
+        setindex_df.drop(['year','month'], axis=1, inplace=True)
 
         if not setindex_df.empty:
             logging.info(f"The total rows that were transformed: {len(setindex_df)}")
@@ -214,9 +209,8 @@ class DataExtractionFuelSalesHook(BaseHook):
             },
             index=pa.MultiIndex([
                 pa.Index(pandas_engine.DateTime(
-                                        to_datetime_kwargs = {"format":"%Y_%m"}), 
-                                        name='year_month'
-                                    ),
+                                        to_datetime_kwargs = {"format":"%Y_%m"}
+                                    ), name="year_month"),
                 pa.Index(str, name='uf'),
                 pa.Index(str, name='product')
             ]),
@@ -257,3 +251,4 @@ class DataExtractionFuelSalesHook(BaseHook):
         )
 
         logging.info("Data has been uploaded successfully!")
+

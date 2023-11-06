@@ -50,18 +50,18 @@ class DataExtractionFuelSalesOperator(BaseOperator):
         transformed_df = hook.transform_data(
                     df
                 )
-        
+                
+        logging.info("\n"+tabulate(transformed_df, headers='keys', tablefmt='psql', numalign="right", floatfmt=".3f"))
+
         validated_df = hook.validate_schema(
                     transformed_df
-                )
+                )   
 
         if not validated_df.empty:
-                logging.info("\n"+tabulate(validated_df, headers='keys', tablefmt='psql', numalign="right", floatfmt=".3f"))
-
-                hook.upload_to_s3(
-                    bucket=self.bucket,
-                    file_name=self.sheet_name,
-                    df=validated_df
-                )
+            hook.upload_to_s3(
+                bucket=self.bucket,
+                file_name=self.sheet_name,
+                df=validated_df
+            )
 
         logging.info("Ending Task...")
