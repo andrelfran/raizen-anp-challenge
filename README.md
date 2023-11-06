@@ -5,8 +5,7 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 ### Sources
 
----
-
+***
 
 * #### ANP Fuels Sales ETL test
     https://github.com/raizen-analytics/data-engineering-test/blob/master/TEST.md
@@ -16,7 +15,8 @@ The purpose of this DAG is to extract the data from the ANP Fuel Sales.XLS file,
 
 
 ### Variables
-_________________
+
+***
 
 A variable must be set up as "data_extraction_config". Follow the example.
 
@@ -30,13 +30,15 @@ A variable must be set up as "data_extraction_config". Follow the example.
 ```
 
 ### Executions
-_________________
+
+***
 
 ![Alt text](image-a.png)
 
 
 ### Destination
-_________________
+
+***
 
 As shown in the previous configuration, the processed data will be sent to an AWS S3 bucket.
 
@@ -50,7 +52,8 @@ As shown in the previous configuration, the processed data will be sent to an AW
 
 
 ### Layers UML Diagram
-_________________
+
+***
 
 ```mermaid
 classDiagram
